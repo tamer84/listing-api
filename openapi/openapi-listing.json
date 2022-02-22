@@ -1,0 +1,739 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Kahula Input API",
+    "description": "API for publishing collection listings",
+    "termsOfService": "",
+    "contact": {
+      "email": "@mercedes-benz.io"
+    },
+    "license": {
+      "name": "UNLICENSED",
+      "url": ""
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.int.kahula.mercedes-benz.io/mgw/dealer"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Kahula",
+      "description": "Commerce Product Supply (Kahula)"
+    }
+  ],
+  "paths": {
+    "/listings": {
+      "post": {
+        "tags": [
+          "Listing"
+        ],
+        "summary": "Create a listing",
+        "description": "Create a new collection stock listing",
+        "operationId": "createListing",
+        "requestBody": {
+          "description": "collection stock listing",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Listing"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/listings/{id}": {
+      "put": {
+        "tags": [
+          "Listing"
+        ],
+        "summary": "Update a listing",
+        "description": "Update a a collection stock listing",
+        "operationId": "updateListing",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Kahula product identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update an existent listing",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Listing"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Listing not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    },
+    "/listings/{id}/availability": {
+      "put": {
+        "tags": [
+          "Availability"
+        ],
+        "summary": "Update a listing availability",
+        "description": "Update a collection listing stock availability",
+        "operationId": "updateAvailability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Kahula product identifier",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Update a collection listing stock availability",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Availability"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Listing not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "reqId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "productId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "reqId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "number",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "Listing": {
+        "type": "object",
+        "properties": {
+          "market": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "enum": [
+              "DE",
+              "FR"
+            ]
+          },
+          "productRecord": {
+            "type": "object",
+            "properties": {
+              "productName": {
+                "type": "string",
+                "description": "Product name"
+              },
+              "code": {
+                "type": "string",
+                "description": "Product inventory code"
+              },
+              "shortDescription": {
+                "type": "string",
+                "description": "Product marketing summary description"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "localizedName": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "name"
+                  ],
+                  "additionalProperties": false,
+                  "default": []
+                },
+                "nullable": true,
+                "description": "Product marketing categories"
+              },
+              "defaultCategory": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "localizedName": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "code",
+                  "name"
+                ],
+                "additionalProperties": false,
+                "nullable": true,
+                "description": "Default category for product"
+              },
+              "propertiesLegal": {
+                "type": "string",
+                "nullable": true,
+                "description": "Legally mandatory product information"
+              },
+              "vendor": {
+                "type": "string",
+                "nullable": true,
+                "description": "Producer"
+              },
+              "variants": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "description": "Article code"
+                    },
+                    "color": {
+                      "type": "object",
+                      "properties": {
+                        "baseColor": {
+                          "type": "string",
+                          "enum": [
+                            "BLACK",
+                            "SILVER",
+                            "GOLD",
+                            "BLUE",
+                            "WHITE",
+                            "BROWN",
+                            "GREY",
+                            "BEIGE",
+                            "YELLOW",
+                            "GREEN",
+                            "RED",
+                            "TURQUOISE",
+                            "ORANGE",
+                            "PINK",
+                            "CARBON",
+                            "PURPLE",
+                            "CHROME",
+                            "UNDEFINED"
+                          ],
+                          "description": "Article color group - UNDEFINED for no color"
+                        },
+                        "colorCode": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "manufacturerColor": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Manufacturer own color description"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "nullable": true
+                    },
+                    "size": {
+                      "type": "object",
+                      "properties": {
+                        "sizeValue": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "bla"
+                        },
+                        "webSize": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Size value to display online"
+                        }
+                      },
+                      "additionalProperties": false,
+                      "nullable": true,
+                      "description": "Article size group (applicable for clothing)"
+                    },
+                    "pricing": {
+                      "type": "object",
+                      "properties": {
+                        "price": {
+                          "type": "object",
+                          "properties": {
+                            "currency": {
+                              "type": "string",
+                              "pattern": "^[A-Z]{3}$",
+                              "description": "ISO 4217 currency code"
+                            },
+                            "value": {
+                              "type": "number",
+                              "format": "double",
+                              "minimum": 0
+                            },
+                            "strikePrice": {
+                              "type": "boolean",
+                              "default": false
+                            },
+                            "priceType": {
+                              "type": "string",
+                              "enum": [
+                                "BUY",
+                                "FROM"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "currency",
+                            "value"
+                          ],
+                          "additionalProperties": false,
+                          "nullable": true
+                        },
+                        "priceRange": {
+                          "type": "object",
+                          "properties": {
+                            "maxPrice": {
+                              "type": "object",
+                              "properties": {
+                                "currency": {
+                                  "type": "string",
+                                  "pattern": "^[A-Z]{3}$",
+                                  "description": "ISO 4217 currency code"
+                                },
+                                "value": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "minimum": 0
+                                },
+                                "strikePrice": {
+                                  "type": "boolean",
+                                  "default": false
+                                },
+                                "priceType": {
+                                  "type": "string",
+                                  "enum": [
+                                    "BUY",
+                                    "FROM"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "currency",
+                                "value"
+                              ],
+                              "additionalProperties": false
+                            },
+                            "minPrice": {
+                              "type": "object",
+                              "properties": {
+                                "currency": {
+                                  "type": "string",
+                                  "pattern": "^[A-Z]{3}$",
+                                  "description": "ISO 4217 currency code"
+                                },
+                                "value": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "minimum": 0
+                                },
+                                "strikePrice": {
+                                  "type": "boolean",
+                                  "default": false
+                                },
+                                "priceType": {
+                                  "type": "string",
+                                  "enum": [
+                                    "BUY",
+                                    "FROM"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "currency",
+                                "value"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": [
+                            "maxPrice",
+                            "minPrice"
+                          ],
+                          "additionalProperties": false,
+                          "nullable": true
+                        },
+                        "vatReclaimable": {
+                          "type": "boolean",
+                          "nullable": true
+                        }
+                      },
+                      "additionalProperties": false,
+                      "nullable": true
+                    },
+                    "media": {
+                      "type": "object",
+                      "properties": {
+                        "images": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "altText": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "format": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "headline": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "imageType": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "stageImage": {
+                                "type": "boolean",
+                                "default": false
+                              },
+                              "youtubeVideoUrl": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "url"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "default": []
+                        },
+                        "videos": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "altText": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "format": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "headline": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "imageType": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "stageImage": {
+                                "type": "boolean",
+                                "default": false
+                              },
+                              "youtubeVideoUrl": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "url": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "url"
+                            ],
+                            "additionalProperties": false
+                          },
+                          "default": []
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "stock": {
+                      "type": "object",
+                      "properties": {
+                        "quantity": {
+                          "type": "integer"
+                        },
+                        "availabilityStatus": {
+                          "type": "string",
+                          "enum": [
+                            "AVAILABLE",
+                            "DELISTED",
+                            "RESERVED",
+                            "ORDERED",
+                            "ORDER_CONFIRMED",
+                            "SOLD",
+                            "UNAVAILABLE"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "quantity",
+                        "availabilityStatus"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "stock"
+                  ],
+                  "additionalProperties": false,
+                  "default": []
+                },
+                "description": "Product variants"
+              },
+              "summaryHtml": {
+                "type": "string",
+                "nullable": true
+              },
+              "productType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "productName",
+              "code",
+              "shortDescription",
+              "productType"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "market",
+          "productRecord"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "requestBodies": {
+      "Listing": {
+        "description": "Listing object that is created or updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Listing"
+            }
+          }
+        }
+      },
+      "Availability": {
+        "description": "Availability object to update a Listing availability",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Availability"
+            }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "x-api-key",
+        "in": "header"
+      }
+    }
+  }
+}
