@@ -7,7 +7,7 @@ variable "application_version" {
 
 variable "application_name" {
   type    = string
-  default = "collect-listing-api"
+  default = "listing-api"
 }
 
 # ========================================
@@ -16,8 +16,8 @@ variable "application_name" {
 terraform {
   backend "s3" {
     encrypt        = "true"
-    bucket         = "kahula-terraform"
-    key            = "resources/col-listing-api/tfstate.tf"
+    bucket         = "tango-terraform"
+    key            = "resources/listing-api/tfstate.tf"
     region         = "eu-central-1"
     dynamodb_table = "terraform"
   }
@@ -29,15 +29,14 @@ provider "aws" {
 
 provider "github" {
   token        = data.terraform_remote_state.account_resources.outputs.github_access_token
-  organization = "mboc-dp"
-  base_url     = "https://git.daimler.com/"
+  base_url     = "https://github.com/tamer84"
 }
 
 data "terraform_remote_state" "account_resources" {
   backend = "s3"
   config = {
     encrypt = "true"
-    bucket  = "kahula-terraform"
+    bucket  = "tango-terraform"
     key     = "account_resources/tfstate.tf"
     region  = "eu-central-1"
   }
@@ -48,7 +47,7 @@ data "terraform_remote_state" "environment_resources" {
   backend = "s3"
   config = {
     encrypt = "true"
-    bucket  = "kahula-terraform"
+    bucket  = "tango-terraform"
     key     = "environment_resources/tfstate.tf"
     region  = "eu-central-1"
   }
@@ -59,7 +58,7 @@ data "terraform_remote_state" "terraform_build_image_resources" {
   backend = "s3"
   config = {
     encrypt = "true"
-    bucket  = "kahula-terraform"
+    bucket  = "tango-terraform"
     key     = "resources/terraform-build-image/tfstate.tf"
     region  = "eu-central-1"
   }
@@ -124,7 +123,7 @@ resource "aws_sqs_queue" "dlq" {
   message_retention_seconds   = 1209600
 }
 
-resource "aws_lambda_permission" "dealer_api_permission" {
+resource "aws_lambda_permission" "listing_api_permission" {
   statement_id  = "AllowDealerApiToInvokeLambda${terraform.workspace}"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.listing-api.function_name
@@ -147,8 +146,7 @@ resource "aws_api_gateway_rest_api" "listing-api" {
   name = "${var.application_name}-${terraform.workspace}"
 
   endpoint_configuration {
-    types            = ["PRIVATE"]
-    vpc_endpoint_ids = [data.terraform_remote_state.environment_resources.outputs.api_gateway_vpc_endpoint.id]
+    types            = ["REGIONAL"]
   }
 
   tags = {
@@ -157,35 +155,7 @@ resource "aws_api_gateway_rest_api" "listing-api" {
   }
 }
 
-// Listing API
-resource "aws_api_gateway_rest_api_policy" "listing-api" {
-  rest_api_id = aws_api_gateway_rest_api.listing-api.id
 
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": "execute-api:Invoke",
-            "Resource": "arn:aws:execute-api:${local.region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.listing-api.id}/*"
-        },
-        {
-            "Effect": "Deny",
-            "Principal": "*",
-            "Action": "execute-api:Invoke",
-            "Resource": "arn:aws:execute-api:${local.region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.listing-api.id}/*",
-            "Condition": {
-                "StringNotEquals": {
-                    "aws:SourceVpce": "${data.terraform_remote_state.environment_resources.outputs.api_gateway_vpc_endpoint.id}"
-                }
-            }
-        }
-    ]
-}
-EOF
-}
 
 //===========  API Gateway Resources ==============//
 
@@ -263,13 +233,20 @@ resource "aws_api_gateway_stage" "listing-api-live-state" {
   }
 }
 
+resource "aws_api_gateway_base_path_mapping" "mapping" {
+  api_id      = aws_api_gateway_rest_api.listing-api.id
+  stage_name  = aws_api_gateway_stage.listing-api-live-state.stage_name
+  base_path   = "listing"
+  domain_name = terraform.workspace == "prod" ? data.terraform_remote_state.account_resources.outputs.api_gateway_domain.domain_name : data.terraform_remote_state.environment_resources.outputs.api_gateway_domain[0].domain_name
+}
+
 # ========================================
 # CICD
 # ========================================
 module "cicd" {
-  source = "git::ssh://git@git.daimler.com/mboc-dp/infra.git//modules/cicd?ref=develop"
+  source = "git::ssh://git@github.com/tamer84/infra.git//modules/cicd?ref=develop"
 
-  codestar_connection_arn = data.terraform_remote_state.account_resources.outputs.dag_git_codestar_conn.arn
+  codestar_connection_arn = data.terraform_remote_state.account_resources.outputs.git_codestar_conn.arn
 
   pipeline_base_configs = {
     "name"        = "${var.application_name}-${terraform.workspace}"
@@ -280,8 +257,7 @@ module "cicd" {
   codebuild_build_stage = {
     "project_name"        = "${var.application_name}-${terraform.workspace}"
     "github_branch"       = local.cicd_branch
-    "github_organisation" = "mboc-dp"
-    "github_repo"         = var.application_name
+    "github_repo"         = "tamer84/${local.cicd_branch}"
     "github_access_token" = data.terraform_remote_state.account_resources.outputs.github_access_token
     "github_certificate"  = "${data.terraform_remote_state.environment_resources.outputs.cicd_bucket.arn}/${data.terraform_remote_state.environment_resources.outputs.github_cert.id}"
 

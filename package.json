@@ -1,5 +1,5 @@
 {
-  "name": "collect-listing-api",
+  "name": "product-listing-api",
   "version": "1.0.0",
   "scripts": {
     "clean": "rm -rf dist; mkdir dist;",
@@ -11,9 +11,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@git.daimler.com:mboc-dp/collect-listing-api.git"
+    "url": "git@github.com:tamer84/listing-api.git"
   },
-  "author": "Kahula",
+  "author": "Tamer Husnu",
   "license": "UNLICENSED",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.19.0",
