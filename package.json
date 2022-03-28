@@ -1,0 +1,30 @@
+{
+  "name": "listing-api",
+  "version": "1.0.0",
+  "scripts": {
+    "clean": "rm -rf dist; mkdir dist;",
+    "prebuild": "cp package.json dist/; cp -R lib dist/;",
+    "build": "yarn install --production --cwd dist/",
+    "zip": "cd dist; zip -r ../$npm_package_name.zip *",
+    "package": "npm run clean; npm run build; npm run zip;",
+    "test": "export EVENT_BUS=unit-test; export PRODUCTID_MAPPING_TABLE=unit-test; jasmine **/*.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tamer84/listing-api.git"
+  },
+  "author": "Tamer Husnu",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "3.19.0",
+    "@aws-sdk/client-eventbridge": "3.19.0",
+    "bunyan": "1.8.15",
+    "joi": "17.4.0",
+    "uuid": "8.3.2"
+  },
+  "devDependencies": {
+    "jasmine": "^3.8.0",
+    "joi-to-swagger": "^5.2.0",
+    "yarn": "^1.22.10"
+  }
+}

@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - yarn install
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Packaging code...
+      - yarn run package
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Running the terraform plan...
+      - ./run.sh
